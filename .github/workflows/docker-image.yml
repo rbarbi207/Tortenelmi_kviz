@@ -5,6 +5,7 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch: 
 
 jobs:
 
@@ -14,7 +15,19 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    - name: Docker Login
+      uses: docker/login-action@v4.8.0
+      with:
+        registry: ghcr.io
+        username: rbarbi207
+        password: ${{ secrets.GHCR_TOKEN }}
+        
     - name: Build the Docker images
       run: | 
-        docker build ./backend -t quiz-backend:$(date +%s)
-        docker build ./frontend -t quiz-frontend:$(date +%s)
+        VERSION=$(date +%s)
+        docker build ./backend -t ghcr.io/rbarbi207/quiz-backend:$VERSION
+        docker build ./frontend -t ghcr.io/rbarbi207/quiz-frontend:$VERSION
+        docker push ghcr.io/rbarbi207/quiz-backend:$VERSION
+        docker push ghcr.io/rbarbi207/quiz-frontend:$VERSION
+
+        
